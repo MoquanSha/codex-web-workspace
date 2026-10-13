@@ -1,0 +1,7 @@
+interface:
+  display_name: "导师套磁助手"
+  short_description: "筛选导师、核验信息并起草套磁邮件"
+  default_prompt: "使用 $advisor-outreach 帮我筛选目标导师并起草一封有证据的套磁邮件。"
+
+policy:
+  allow_implicit_invocation: true

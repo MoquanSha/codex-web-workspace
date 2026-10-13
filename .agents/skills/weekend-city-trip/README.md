@@ -1,0 +1,720 @@
+# Weekend City Trip · 周末城市旅游攻略调研 Skill
+
+> 一个让 AI 帮你 5 分钟深度调研任意中国城市周末玩法的 Claude Code/Codex Skill。
+> 基于 **anysearch WebSearch API**(JSON-RPC 2.0),输出图文并茂、可执行的 Markdown / HTML 攻略。
+
+---
+
+## 目录
+
+- [这是什么](#这是什么)
+- [解决什么问题](#解决什么问题)
+- [能调研哪些内容(11 个方向)](#能调研哪些内容11-个方向)
+- [使用示例](#使用示例)
+- [生成报告长什么样](#生成报告长什么样)
+- [前置准备](#前置准备)
+- [API Key 配置(必读)](#api-key-配置必读)
+- [安装](#安装)
+- [工作流程(10 步法)](#工作流程10-步法)
+- [项目结构](#项目结构)
+- [关键能力](#关键能力)
+- [常见问题](#常见问题)
+- [限制与边界](#限制与边界)
+- [成本估算](#成本估算)
+- [贡献](#贡献)
+- [许可](#许可)
+
+---
+
+## 这是什么
+
+**weekend-city-trip** 是一个 [Claude Code/Codex Skill],专门用来做**中国城市的周末 / 短期(1 个月内)旅游深度调研**。
+
+### 为什么做这个项目？
+
+一方面我是积累很多旅游经验，我知道怎样发掘城市的魅力。 例如：小红书近期城市活动 ,演唱会,集市，球赛，博物馆 ， 地方宝优惠票 ， 有喜茶的购物中心有哪些， 美食街，city walk, 5a景区，以上地点的地铁路线， 全面调查，一个一个完成，然后做成详细文档
+为什么要经常去城市看看？无论是否去过，不是说去过就不去，因为过去去旅游景区那种去不去都一样。关键是看城市化，人的新生活，到处的创新，活动，展会， 兴趣消费，
+从这些，你才知道人们的需求，才知道自己要干嘛，开发什么AI项目，人们需要什么。
+不然，其实我们完全没有创新。多深刻体验我国的城市新兴生活方式！
+我利用我的经验介绍怎样从城市里面发现新东西，有价值的东西，促进自己能够赚钱的方向！
+核心就是：1 要快，skill帮你安排很好的路线，城市最有看点的地方， 2 要准，你直接去到那些新兴活动，市集，生产力丰富，年轻人聚集点，我给你安排好，3 要新，都是最新的城市活动，你去旅游景区全部外地人，没有可能接触到什么真正的城市，我安排的都是本地人聚集的活动地点。
+
+### 使用示例
+
+先配置好 API Key （.env）, 你只需要对 Claude Code/Codex 说一句话,比如:
+
+> "利用city skill调研下周末广州有什么好玩的"
+> "利用city skill调研下个月深圳有什么活动的，并生成地图"
+
+这个 skill 就会自动:
+
+1. 算清楚"下周末"是哪两天
+2. 用 **anysearch API** 并行发起 10+ 次中文网页搜索
+3. 把搜索结果按 10 节标准结构整合成一份**图文并茂的 Markdown 报告**
+4. **自动质量检查** — 不达标会触发补查询重写(最多 2 轮迭代)
+5. (可选)把 Markdown 转成**漂亮的 HTML 单文件**方便分享
+6. (可选)把 Markdown 转成**漂亮的 地图 HTML 单文件**方便分享
+
+最终交付物是一份 20-30 KB 的城市周末行动方案,覆盖吃、喝、玩、乐、行、住各个维度。
+
+---
+
+## 解决什么问题
+
+自己做一份"周末去 XX 城市"的攻略,**手动查资料痛点很明显**:
+
+| 痛点 | 手动方式 | 本 Skill |
+|---|---|---|
+| **信息分散** | 小红书、大众点评、马蜂窝、本地宝、官方文旅...要查 N 个平台 | 一句话触发,anysearch API 一次性召回主流中文信源 |
+| **时效性差** | 翻到的常常是 2022 年的旧攻略 | query 关键词强制带 `2026年7月` / `本周末` / `暑期`,优先近期文章 |
+| **缺关键信息** | 演唱会没写票价、地铁没写出口、景区没写优惠 | 11 个方向标准化覆盖,缺啥会自动补查 |
+| **结构混乱** | 自己整理笔记东一榔头西一棒槌 | 10 节固定结构,从"一图速览"到"周末组合路线"全覆盖 |
+| **可信度低** | AI 一把梭常常幻觉编造 | 强制 ≥ 2 个信源验证 + 显式标注信源 + 出行前二次确认提示 |
+| **分享不便** | Markdown 给非技术朋友看不懂 | 一键转 HTML 单文件,自带样式,浏览器打开就能看 |
+
+---
+
+## 能调研哪些内容(11 个方向)
+
+| # | 方向 | 典型问题 |
+|---|---|---|
+| 1 | **小红书近期活动** | 这周小红书上大家都在打卡啥? |
+| 2 | **演唱会 / 演出** | 下周末有哪些演唱会?时间场馆票价? |
+| 3 | **集市 / 市集** | 哪里有创意市集、古着市集? |
+| 4 | **球赛** | 中超 / CBA 主场比赛安排? |
+| 5 | **博物馆 / 美术馆** | 必去博物馆有哪些?当前在展什么? |
+| 6 | **优惠门票(本地宝)** | 暑期学生特惠、考生免费、半价票? |
+| 7 | **喜茶门店 + 购物中心** | 城市 LAB / DP / PINK 主题店在哪?十大购物中心? |
+| 8 | **美食街** | 本地人真的会去的美食街是哪几条? |
+| 9 | **city walk 路线** | 经典步行路线有哪些?节点 + 拍照点? |
+| 10 | **5A 景区** | 城市 5A 景区清单 + 票价 + 交通? |
+| 11 | **地铁路线** | 线网总览 + 关键站点出口 + 直达商场? |
+
+**最终整合为 10 节报告**:
+
+```
+〇、一图速览(表格)
+一、活动全清单(演唱会/集市/球赛/博物馆/5A)
+二、优惠门票
+三、喜茶门店热点
+四、美食街
+五、city walk 路线
+六、地铁路线(含 5A 景区 + 商场直达)
+七、周末组合路线(A/B/C 三条主题路线)
+八、时效可靠性说明
+九、API 调用统计
+十、引用源
+```
+
+---
+
+## 使用示例
+
+### 基础用法(Markdown 输出)
+
+直接对 Claude Code/Codex 说:
+
+```
+调研下周末广州有什么好玩的,要图文版
+```
+
+或者:
+
+```
+我想本周末去上海,帮我全面调查一下
+```
+
+或者:
+
+```
+成都未来一个月旅游调研,情侣向
+```
+
+Claude 会自动触发这个 skill,生成:
+
+```
+D:/fireclaw-travel/广州下周末调查报告_Anysearch版.md
+```
+
+### 进阶用法(HTML 输出)
+
+加一句"要 HTML":
+
+```
+调研下周末杭州,生成 html 报告
+```
+
+或者用 skill 内部命令:
+
+```
+/weekend-city-trip 杭州,时间下周末,格式 html
+```
+
+会多生成一份单文件 HTML,自带 CSS,浏览器打开直接看,也方便打印为 PDF 分享给朋友。
+
+### 进阶用法(地图生成)
+
+加一句"地图版"/"标在地图上":
+
+```
+调研下周末杭州,生成地图版
+```
+
+或:
+
+```
+调研杭州 7 月 4-5 日,把所有地点标在地图上
+```
+
+会触发 Step 10 四步流程(agent 抽取地点 → geocode → inject → validate),输出:
+- `{城市}{时间}地图_Anysearch版.html`(30-40KB,双击即可打开)
+- 11 类水滴形彩色标记 + 分类筛选 + 搜索 + 双向联动
+- **不依赖 http 服务器**,坐标预编码,可离线分享
+
+**前提**:用户需自行配置高德 Key(详见 [API Key 配置](#api-key-配置必读))。
+
+### 明确时间 + 偏好
+
+```
+调研上海 7 月 4-5 日,带娃亲子向,要 html
+```
+
+skill 会:
+- 把时间锁定为 2026/7/4-7/5(具体日期)
+- 在 query 里加"亲子 / 家庭 / 儿童"关键词
+- 最终生成 MD + HTML 双格式
+
+---
+
+## 生成报告长什么样
+
+**典型产出**:
+
+- 文件大小:20-30 KB(MD)/ 30-40 KB(HTML)
+- 行数:450-550 行
+- 信源数:30-50 个权威网站引用
+
+**信源优先级**:腾讯新闻、网易、人民网、官方文旅局、本地宝、行业垂直媒体(如大麦、猫眼)、小红书高赞笔记。
+
+**报告特点**(anysearch 无 thumbnailUrl,纯文字版):
+
+1. **一图速览** — 10 秒拿到核心情报表格
+2. **时间地点完整** — 演出有日期、场馆、票价;景点有票价、地铁
+3. **emoji + 表格 + 粗体强调** — 替代图片,信息密度更高
+4. **三条周末路线** — 文艺 / 情侣 / 家庭三种主题,带时间表
+5. **二次确认声明** — 票价 / 演出嘉宾可能变动,标注"出行前请二次确认"
+6. **API 调用透明** — 列出每次调用的 query、返回条数
+
+---
+
+## 前置准备
+
+### 1. anysearch API Key(调研报告必需,可选 anonymous)
+
+去 [anysearch 官网](https://anysearch.com/console/api-keys) 注册,获取 API Key(格式 `as_sk-xxx`)。
+
+**anonymous 模式也可用**,但 QPS 较低;有 Key 则额度更高。
+
+### 2. 高德 API Key(地图生成必需,纯调研报告可跳过)
+
+如果要生成 HTML 地图(Step 10),需要到 [高德开放平台](https://console.amap.com/dev/key/app) 申请**两类 Key**:
+
+- **Web 端(JS API)Key + 安全密钥**:浏览器加载地图底图用
+- **Web 服务 Key**:Python 服务端批量地理编码用
+
+**两类是不同的 Key,不能互通**。详细配置见下方 [API Key 配置](#api-key-配置必读) 章节。
+
+### 3. Python(HTML / 地图输出必需)
+
+- **Python 3.7+**(脚本依赖)
+- **推荐安装**(完整 GFM 支持):
+  ```bash
+  pip install markdown pymdown-extensions
+  ```
+- **不装也能用**:脚本会自动降级到内置极简转换器,基础表格/代码块/列表都支持
+
+### 4. Claude Code/Codex
+
+- 已安装 Claude Code/Codex CLI
+- 把本 skill 放到 `.claude/skills/weekend-city-trip/`(参见[安装](#安装))
+
+---
+
+## 安装
+
+### 方式 1:克隆到全局 skills 目录
+
+```bash
+直接命令 claude code/ codex , 帮忙安装skill: github.com/liangdabiao/weekend-city-trip
+```
+
+### 方式 2:克隆到项目级 skills 目录
+
+```bash
+# 在你的项目目录下
+cd your-project/
+mkdir -p .claude/skills/
+git clone <your-repo-url> .claude/skills/weekend-city-trip
+```
+
+### 验证安装
+
+在 Claude Code/Codex 里输入:
+
+```
+/skills
+```
+
+应该能看到 `weekend-city-trip` 出现在列表里。
+
+### 验证 API Key 是否生效
+
+```bash
+# 验证 anysearch
+echo $ANYSEARCH_API_KEY  # 应输出 as_sk-xxx(无 key 也可走 anonymous)
+
+# 验证高德(可选,仅地图生成需要)
+echo $AMAP_KEY $AMAP_JS_KEY $AMAP_SECURITY
+```
+
+更详细的 Key 配置见下方 [API Key 配置](#api-key-配置必读) 章节。
+
+---
+
+## API Key 配置(必读)
+
+本 skill 涉及**两个服务的 API Key**,均需用户自行申请,**skill 不内置任何 Key**。
+
+### 1. anysearch API Key(调研报告所需,可选 anonymous)
+
+| 项 | 值 |
+|---|---|
+| 申请地址 | https://anysearch.com/console/api-keys |
+| 环境变量 | `ANYSEARCH_API_KEY` |
+| 格式 | `as_sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
+| 免费额度 | anonymous 也可用(低 QPS),配 Key 升级额度 |
+
+**配置方式**(写入 skill 目录下的 `.env` 也可):
+
+```bash
+# bash / git-bash(推荐持久化到 ~/.bashrc)
+export ANYSEARCH_API_KEY="as_sk-xxx"
+
+# Windows PowerShell
+$env:ANYSEARCH_API_KEY="as_sk-xxx"
+```
+
+**配额耗尽自动续 Key**:响应 `auto_registered` 字段会自动签发新 Key,agent 会征求用户同意后存盘。
+
+### 2. 高德 API Key(地图生成必需)
+
+如果要生成 HTML 地图(Step 10),需要**两类 Key**(不能互通):
+
+| 环境变量 | Key 类型 | 申请入口 | 用途 |
+|---|---|---|---|
+| `AMAP_JS_KEY` | Web 端(JS API) | 高德控制台 → 应用类型选「Web 端(JS API)」 | 浏览器加载地图底图 |
+| `AMAP_SECURITY` | 安全密钥(与 JS API Key 配套) | 同上,Key 详情页可见 | JS API 鉴权(2021-12-02 后申请的 Key 必填) |
+| `AMAP_KEY` | Web 服务 | 高德控制台 → 应用类型选「Web 服务」 | Python 服务端批量地理编码 |
+
+**配置方式**:
+
+```bash
+# bash / git-bash(推荐持久化到 ~/.bashrc)
+export AMAP_JS_KEY="用户提供的 JS API Key"
+export AMAP_SECURITY="用户提供的安全密钥"
+export AMAP_KEY="用户提供的 Web 服务 Key"
+
+# Windows PowerShell
+$env:AMAP_JS_KEY="..."
+$env:AMAP_SECURITY="..."
+$env:AMAP_KEY="..."
+```
+
+**两类 Key 不能互通**:
+- JS API Key 调 REST 会报 `USERKEY_PLAT_NOMATCH`
+- Web 服务 Key 在浏览器加载会被拒绝
+
+**安全密钥的前端暴露**:JS API 安全密钥会出现在最终 HTML 里(高德常规用法,无法避免)。生产环境可通过代理服务器转发隐藏,个人调研直接内置即可。
+
+### 3. Key 缺失时的行为
+
+| 脚本 | 缺失 Key | 行为 |
+|---|---|---|
+| Step 5 调研 | `ANYSEARCH_API_KEY` | 自动降级 anonymous(低 QPS) |
+| Step 10 `geocode.py` | `AMAP_KEY` | 打印帮助信息 + 退出码 2 |
+| Step 10 `inject.py` | `AMAP_JS_KEY` 或 `AMAP_SECURITY` | 打印帮助信息 + 退出码 2 |
+
+所有错误信息都会指导用户到对应控制台申请,不会编造假 Key。
+
+---
+
+## 工作流程(10 步法)
+
+skill 内部执行流程,公开透明,方便排查问题。
+
+### Step 1:时间锁定
+
+算清楚"本周末/下周末/未来一个月"对应的具体日期。
+
+**关键洞察**:新闻文章发布时间 ≠ 活动举办时间。一篇 6/26 发布的文章可能在介绍 7/4 的活动,所以 query 必须带 `2026年7月` / `近期` / `本周末` 等时效关键词。
+
+### Step 2:用户确认
+
+如果用户消息里已经有城市 + 时间,直接进入 Step 3。否则用 `AskUserQuestion` 询问。
+
+### Step 3:建任务 + 工作目录
+
+```
+D:/fireclaw-travel/anysearch_{城市拼音}/
+```
+
+创建 6 个 TodoTask,跟踪进度。
+
+### Step 4:写 query JSON 文件
+
+为每个调查方向写 query body。anysearch 无 freshness 字段,改用 query 关键词隐式表达时效。
+
+```bash
+# 通过 anysearch CLI batch_search 调用,详见 references/query_templates.md
+```
+
+### Step 5:3 路并行批次执行
+
+**anysearch batch_search 1-5 并行**,11 次调用拆成 **5+4+2** 三个批次:
+
+```bash
+python $SKILL_DIR/scripts/anysearch_cli.py batch_search --queries '[
+  {"query":"广州 周末活动 展览 演出 市集 演唱会 2026年7月","max_results":10},
+  {"query":"小红书 广州 拍照 网红 打卡 同城活动 暑期","max_results":10},
+  ...
+]' > "$DIR/r_batch1.json"
+```
+
+### Step 6:解析响应
+
+anysearch 是 JSON-RPC 2.0,响应在 `result.content[].text`,按 `--- 标题:` 切分多条结果。
+
+**字段**:标题 / URL / 摘要(纯文本 snippet,无 AI 摘要,无 thumbnailUrl)。
+
+### Step 7:整合纯文字报告(初稿)
+
+按 10 节标准结构整合,输出到:
+
+```
+D:/fireclaw-travel/{城市}{时间}调查报告_Anysearch版.md
+```
+
+**注意**:这只是初稿,**不等于任务完成**。必须经过 Step 8 质量检查才能交付。
+
+### Step 8:质量检查与迭代优化(必做)
+
+这是这个 skill 的**核心差异化能力**,详见 [quality_check.md](references/quality_check.md)。
+
+#### 8.1 自动检查
+
+用 Python 脚本扫描初稿,5 大维度:
+- **完整性**:11 调查方向 + 10 节结构是否齐全
+- **准确性**:时间/地点/价格是否真实
+- **丰富度**:每节信息密度是否达标
+- **可执行性**:周末路线时间是否冲突
+- **信源多样性**:关键信息是否 ≥ 2 个信源
+
+#### 8.2 各节最低信息密度
+
+| 章节 | 最低 | 优秀 |
+|---|---|---|
+| 演唱会/演出 | 3 场 | 5+ 场含时间/场馆/票价 |
+| 博物馆 | 3 个 | 5+ 个含当前展览 |
+| 5A 景区 | 2 个 | 4+ 个含票价/交通 |
+| 优惠门票 | 3 个景区 | 5+ 个含原价/现价/规则 |
+| 喜茶门店 | 2 家主题店 | 3+ 家含开业日期/产品 |
+| 美食街 | 3 条 | 5+ 条含区域/代表店 |
+| city walk | 1 条路线 | 2+ 条含节点/长度 |
+| 地铁出口 | 2 个站点 | 4+ 站点含 A/B/C/D 编号 |
+
+#### 8.3 触发补查询(最多 2 轮)
+
+| 触发条件 | 等级 | 行动 |
+|---|---|---|
+| 任一调查方向完全缺失 | 🔴 必补 | 立刻补查询 |
+| 演唱会 < 3 场 | 🔴 必补 | 补查询 |
+| 跨城市噪声 > 30% | 🔴 必补 | 重写 query 加强城市前缀 |
+| 喜茶门店 < 2 家 | 🟡 建议补 | 补查询 |
+| 美食街 < 3 条 | 🟡 建议补 | 补查询 |
+| 直达商场 < 5 个 | 🟢 可选 | 视余量决定 |
+
+#### 8.4 迭代控制
+
+- 最多 2 轮补查询(防止无限循环)
+- 总 API 调用 ≤ 15 次(初始 11 + 补救 4)
+- 第 3 轮仍不达标 → 标注"信息有限"交付
+
+### Step 9:HTML 输出(可选)
+
+**触发条件**:用户明确要求 HTML 格式。
+
+**前置条件**:Step 8 必须已通过。
+
+```bash
+python .claude/skills/weekend-city-trip/scripts/md_to_html.py \
+  "D:/fireclaw-travel/{城市}{时间}调查报告_Anysearch版.md"
+```
+
+HTML 特性:
+- GFM 完整支持(表格/代码块/引用块)
+- 内嵌 CSS(单文件可分享,无外部依赖)
+- 中文字体优化(苹方/微软雅黑/思源黑体 fallback)
+- 响应式布局(手机/平板/桌面自适应)
+- 打印友好(`@media print` 样式,可直接打印为 PDF)
+
+### Step 10:HTML 地图面板生成(可选)
+
+**触发条件**:用户明确要求生成地图(如"生成地图"、"标在地图上"、"地图版")。
+
+**前置条件**:
+- Step 8 已通过
+- 用户已配置高德 Key(见 [API Key 配置](#api-key-配置必读))
+
+**四步生成**(agent 抽取 + Python 服务端预编码坐标):
+
+```bash
+SKILL=.claude/skills/weekend-city-trip
+REPORT="D:/fireclaw-travel/{城市}{时间}调查报告_Anysearch版.md"
+
+# Step 1: agent 抽取地点(你 runtime agent 读 markdown,识别真实地点,写 places.json)
+#         → 不调用任何外部 LLM API
+
+# Step 2: 服务端地理编码(需要 AMAP_KEY)
+python "$SKILL/scripts/geocode.py" \
+  "D:/fireclaw-travel/{城市}{时间}调查报告_Anysearch版.places.json" {城市}
+
+# Step 3: 注入模板生成最终 HTML(需要 AMAP_JS_KEY + AMAP_SECURITY)
+python "$SKILL/scripts/inject.py" \
+  "D:/fireclaw-travel/{城市}{时间}调查报告_Anysearch版.places.geo.json" \
+  "D:/fireclaw-travel/{城市}{时间}地图_Anysearch版.html" \
+  {城市} "{时间范围如 2026/7/4-5}"
+
+# Step 4: 自动质量验证
+python "$SKILL/scripts/validate_map.py" \
+  "D:/fireclaw-travel/{城市}{时间}地图_Anysearch版.html"
+```
+
+**输出**:双击 `{城市}{时间}地图_Anysearch版.html` 即可打开,**坐标已预编码,无需 http 服务器**。
+
+**地图特性**:
+- 11 类水滴形标记(演唱会/球赛/集市/博物馆/5A/喜茶/美食街/City Walk/购物中心/地铁站/优惠门票)
+- 分类筛选 pill(显示/隐藏类别)
+- 搜索框(实时过滤名称/地址/备注)
+- 双向联动(点卡片飞至地图 / 点 marker 高亮卡片)
+- 自动视野适配 + 响应式布局
+- NaN 坐标保护(无坐标的地点不参与飞至)
+
+**预期效果**:30-70 个地点 → 60-90% 编码成功 → 30-40KB 单文件 HTML。
+
+详细参考 [`references/map_generation.md`](references/map_generation.md)。
+
+---
+
+## 项目结构
+
+```
+weekend-city-trip/
+├── SKILL.md                          # Skill 主文件(10 步法 + API 用法)
+├── README.md                         # 本文件
+├── references/
+│   ├── query_templates.md            # 11 个方向的 query body 模板
+│   ├── report_template.md            # 10 节报告标准结构模板
+│   ├── anysearch_notes.md            # anysearch 踩坑清单 + 决策树
+│   ├── quality_check.md              # 质量检查 + 补查询迭代规则
+│   └── map_generation.md             # 地图生成工作流(Step 10 详解)
+├── templates/
+│   └── map_panel.html                # 高德 JS API 2.0 地图模板(占位符)
+└── scripts/
+    ├── md_to_html.py                 # Markdown → HTML 转换器(Step 9)
+    ├── geocode.py                    # places.json → places.geo.json(Step 10-B)
+    ├── inject.py                     # geo.json → 最终 HTML(Step 10-C)
+    ├── validate_map.py               # 地图质量验证(Step 10-D)
+    ├── known_coords.json             # 预存坐标库
+    └── build_map.sh                  # 一键管线 orchestrator
+```
+
+### 各文件作用
+
+| 文件 | 何时用 | 内容 |
+|---|---|---|
+| `SKILL.md` | 主流程入口 | 10 步法、API 用法速查、踩坑 Top 8 |
+| `references/query_templates.md` | 设计 query 时 | 11 个方向的 query body 模板,带 {CITY}/{MONTH} 占位符 |
+| `references/report_template.md` | 整合报告时 | 10 节结构示例、Python 提取脚本 |
+| `references/anysearch_notes.md` | 遇到异常时 | 踩坑详解 + 决策树 + 状态码表 |
+| `references/quality_check.md` | 报告写完后 | 5 维度检查 + 12 个触发条件 + 8 个补查询模板 |
+| `references/map_generation.md` | 生成地图时 | 四步工作流详解、Key 配置、11 类配色、常见错误排查 |
+| `templates/map_panel.html` | 生成地图时 | 高德 JS API 2.0 模板,含 `{{AMAP_JS_KEY}}` / `{{AMAP_SECURITY}}` 占位符 |
+| `scripts/md_to_html.py` | 用户要 HTML 报告时 | 三档优先级转换 + 内嵌 CSS |
+| `scripts/geocode.py` | 地图 Step 2 | 调高德 Web 服务 REST,补 lat/lng,需要 `AMAP_KEY` |
+| `scripts/inject.py` | 地图 Step 3 | 替换模板占位符,输出最终 HTML,需要 `AMAP_JS_KEY` + `AMAP_SECURITY` |
+| `scripts/validate_map.py` | 地图 Step 4 | 7 项自动质量检查 |
+
+---
+
+## 关键能力
+
+### 1. 跨城市标准化
+
+不同城市的搜索召回存在差异。skill 用**城市前缀 + 多区域关键词**应对召回波动。
+
+### 2. 时效性保障
+
+- query 关键词强制带 `2026年7月` / `本周末` / `暑期`
+- 但**理解"发布时间 ≠ 举办时间"**,允许旧文章介绍未来活动
+- 报告末尾标注"出行前请二次确认"
+
+### 3. 信源可信度
+
+- 优先权威媒体(腾讯/网易/人民网/官方文旅)
+- 关键信息(票价/演出嘉宾)要求 ≥ 2 个信源验证
+- 信源清单完全公开,报告末尾按任务分类列引用
+
+### 4. 反幻觉
+
+- 不编造未在 snippet 中出现的信息
+- 单源可疑数据标注或删除
+- runtime agent 全程主导判断与生成(不调任何外部 LLM API)
+
+### 5. 质量保障闭环
+
+**报告生成 ≠ 任务完成**。Step 8 强制检查 + 最多 2 轮迭代优化,确保交付质量稳定。详见 [quality_check.md](references/quality_check.md)。
+
+### 6. 失败优雅降级
+
+- markdown 库没装 → markdown2 → 兜底内置转换器
+- anysearch 配额耗尽 → 自动续 key(征用户同意后存盘)
+- 无 API key → anonymous 模式(低 QPS)
+
+---
+
+## 常见问题
+
+### Q1:一定要 anysearch API 吗?可以用 Google/Bing 吗?
+
+**目前仅支持 anysearch**。原因:
+- anysearch 对中文索引覆盖良好
+- JSON-RPC 2.0 接口稳定,支持 batch_search 并行
+- anonymous 模式可用,配 Key 升级额度
+
+### Q2:支持海外城市吗?
+
+anysearch 以中文索引为主,海外城市召回偏低。海外场景建议用其他通用 web search skill。
+
+### Q3:每次调研消耗多少 API 额度?
+
+**11-15 次 query 调用**(初始 11 + 补救 4),按 5+4+2 三批次发起。anonymous 模式 QPS 较低,建议配 Key。
+
+### Q4:生成的报告可以商用吗?
+
+报告内容来自公开网页,版权归原作者。**调研结果仅供个人参考**,商用请自行核实版权。
+
+### Q5:HTML 转换一定要装 markdown 库吗?
+
+**不装也能用**。脚本三档优先级:
+1. python-markdown(完整 GFM)
+2. markdown2(次选)
+3. 内置兜底转换器(基础支持,无需任何外部库)
+
+但**强烈推荐装** `pip install markdown pymdown-extensions`,完整 GFM 表格、代码高亮、任务列表等特性才完整。
+
+### Q6:为什么 11 个方向拆成 6 个 TodoTask?
+
+平衡信息密度与执行效率。同类方向(如演唱会 + 集市 + 球赛)合并到一个任务,既避免任务碎片化,又保持清晰度。
+
+### Q7:为什么 batch_search 拆 5+4+2 三批?
+
+anysearch `batch_search` 限制 1-5 query 并行。11 个 query 拆 5+4+2 是最经济的批次划分,总耗时 30-60 秒。
+
+### Q8:报告里有"二次确认"提示,是不是数据不可靠?
+
+**部分信息可能时效性偏弱**(如地铁出口编号、票价微调)。skill 已经做了多源验证,但仍建议:
+- 演出票务:出行前到大麦 / 猫眼二次确认
+- 景区票价:出行前到官方公众号二次确认
+- 营业时间:出行前到大众点评二次确认
+
+---
+
+## 限制与边界
+
+### ✅ 适用场景
+
+- 中国大陆城市调研
+- 周末 / 1 个月内短期旅游
+- 任意 4-7 线及以上城市(北上广深、成都、杭州、武汉、西安、南京...)
+
+### ❌ 不适用场景
+
+- 海外城市(召回偏低)
+- 长期旅居 / 移民调研(超过 1 个月)
+- 单一深度主题(如只查某场演唱会票价 → 直接 WebSearch 即可)
+- 极端小众县城(索引可能覆盖不足)
+
+### 已知限制
+
+- 不同城市召回数量波动 5-15 条
+- 长尾信息(地铁出口编号)文章偏旧(2018-2022),但出口编号基本不变
+- 无 thumbnailUrl,报告统一纯文字版(emoji + 表格 + 粗体强调)
+- 不支持 JS 渲染(复杂 SPA 网页摘要可能不全)
+
+---
+
+## 成本估算
+
+### 时间成本
+
+| 阶段 | 耗时 |
+|---|---|
+| Step 1-4(准备 + 写 query) | 1-2 分钟 |
+| Step 5(并行调用 3 批次) | 30-60 秒 |
+| Step 6-7(解析 + 整合) | 3-5 分钟 |
+| Step 8(质量检查 + 补查询) | 2-5 分钟(视触发条件) |
+| Step 9(HTML 报告输出,可选) | 30 秒 |
+| Step 10(HTML 地图生成,可选) | 1-2 分钟(agent 抽取 + geocode + inject + validate) |
+| **总计** | **7-15 分钟** |
+
+### API 额度
+
+**anysearch**(调研报告):
+- 初始:11 次 query(5+4+2 三批次)
+- 补救:0-4 次(视触发条件)
+- **总计:11-15 次**
+
+**高德**(地图生成,可选):
+- Web 服务地理编码:30-70 次/城市(每次调研,免费配额 3000 次/日)
+- JS API 底图加载:浏览器端调用,免费配额 30 万次/日
+- 个人调研完全够用,基本不会触顶
+
+---
+
+## 贡献
+
+欢迎 PR / Issue。特别欢迎以下贡献:
+
+- 新城市的 query 模板优化(不同城市关键词差异)
+- 报告结构的本地化适配(如港台场景)
+- HTML 模板美化(当前是 GitHub 风格,可加更多主题)
+- 翻译为英文(海外华人用户)
+
+---
+
+## 许可
+
+MIT License — 详见 [LICENSE](LICENSE)。
+
+---
+
+## 一句话总结
+
+**说一句话 → 11-15 次 anysearch API 调用 → 7-15 分钟 → 20-30 KB 纯文字攻略 → 覆盖吃 / 喝 / 玩 / 乐 / 行的 10 节标准报告 + 三条周末路线。**
+
+让 AI 帮你把"周末去哪玩"的攻略难题,变成一句话的事。
+
+
+## 特别感谢：
+https://linux.do 社区佬友
+https://anysearch.com/  anysearch API 提供方

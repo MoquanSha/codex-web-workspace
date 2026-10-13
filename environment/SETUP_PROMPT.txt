@@ -1,0 +1,11 @@
+请配置这个私有仓库作为我的个人 Codex 云端工作区。
+
+先读取 AGENTS.md、memory/INDEX.md 和 memory/PROFILE.md，再按需读取两份完整个人画像。遵守里面的中文表达、研究叙事与证据边界，不自动修改个人画像。
+
+先运行 python3 scripts/validate_bundle.py。通过后运行 bash scripts/setup.sh --documents --lark。后续 Python 工具使用 .venv/bin/python；飞书 CLI 位于 tools/lark/node_modules/.bin/lark-cli。如需渲染 Office 文件，先检查 LibreOffice 是否存在，需要时在此云端环境安装并验证。
+
+确认 .agents/skills 中的仓库技能可以发现；若初始技能列表不完整，通过 environment/skill-catalog.json 查询。skill-library/plugins 中只有插件资料，不代表相关服务已连接。飞书先检查 auth status --verify，未授权就标为待授权，不上传或复制本机凭据。
+
+环境仅自己可用，保持 Only me。按实际需要启用包管理器网络，不添加无关账号、付费服务或 GPU 资源。读取本地模型偏好 environment/local-preferences.json，并说明当前云端是否可选；不要声称仓库 JSON 已修改网页模型设置。
+
+验证资料读取、技能发现、文档库导入、CLI 可运行后给出真实结果，保存安装配置并发布环境。如果网页要求我点击最后的发布按钮，告诉我需要点击哪里。发布后开一个新任务，用 README.md 第 1.6 节验证个人画像加载。不要把静态文件检查通过说成第三方服务或全部技能已运行通过。

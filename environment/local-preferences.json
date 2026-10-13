@@ -1,0 +1,34 @@
+{
+  "export_date": "2026-10-13",
+  "timezone": "Asia/Shanghai",
+  "local_model_preference": "gpt-6-astra",
+  "local_reasoning_preference": "high",
+  "application": "Choose these in the cloud UI if available; this file does not set the cloud model.",
+  "local_plugin_ids": [
+    "hugging-face@openai-curated",
+    "github@openai-curated",
+    "canva@openai-curated",
+    "documents@openai-primary-runtime",
+    "spreadsheets@openai-primary-runtime",
+    "presentations@openai-primary-runtime",
+    "pdf@openai-primary-runtime",
+    "template-creator@openai-primary-runtime",
+    "visualize@openai-bundled",
+    "codex-app-tools@openai-bundled",
+    "browser@openai-bundled",
+    "unified-computer-use@openai-bundled",
+    "chrome@openai-bundled",
+    "computer-use@openai-bundled"
+  ],
+  "not_migrated": [
+    "authentication",
+    "model-provider endpoints and keys",
+    "MCP server process configuration",
+    "permissions and sandbox bypasses",
+    "hooks and notifications",
+    "trusted Windows project directories",
+    "browser sessions",
+    "raw conversations",
+    "scheduled jobs"
+  ]
+}

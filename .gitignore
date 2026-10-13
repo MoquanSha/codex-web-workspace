@@ -1,0 +1,26 @@
+# Never put account state, secrets, execution caches or raw conversations in Git.
+.env
+.env.*
+!.env.example
+auth.json
+credentials.json
+cookies.txt
+*.pem
+*.key
+*.p12
+*.db
+*.sqlite*
+*.jsonl
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.cache/
+.codex/
+.lark/
+.lark-cli/
+.ssh/
+/materials/
+/tmp/
+/runtime/

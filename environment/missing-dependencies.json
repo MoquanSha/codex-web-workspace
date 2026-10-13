@@ -1,0 +1,102 @@
+[
+  {
+    "skill": ".agents/skills/experiment-plan/SKILL.md",
+    "reference": "../../shared-references/output-versioning.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/experiment-plan/SKILL.md",
+    "reference": "../../shared-references/output-manifest.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/experiment-plan/SKILL.md",
+    "reference": "../../shared-references/output-language.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/idea-discovery/SKILL.md",
+    "reference": "../shared-references/output-composition.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/idea-discovery/SKILL.md",
+    "reference": "../../shared-references/output-versioning.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/idea-discovery/SKILL.md",
+    "reference": "../../shared-references/output-manifest.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/idea-discovery/SKILL.md",
+    "reference": "../../shared-references/output-language.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/idea-discovery-robot/SKILL.md",
+    "reference": "../../shared-references/output-versioning.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/idea-discovery-robot/SKILL.md",
+    "reference": "../../shared-references/output-manifest.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/idea-discovery-robot/SKILL.md",
+    "reference": "../../shared-references/output-language.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/paper-plan/SKILL.md",
+    "reference": "../../shared-references/output-versioning.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/paper-plan/SKILL.md",
+    "reference": "../../shared-references/output-manifest.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/paper-plan/SKILL.md",
+    "reference": "../../shared-references/output-language.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/ppt-master/SKILL.md",
+    "reference": "../../docs/zh/templates-architecture.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/research-pipeline/SKILL.md",
+    "reference": "../shared-references/external-cadence.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/research-pipeline/SKILL.md",
+    "reference": "../shared-references/resumable-runs.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/research-pipeline/SKILL.md",
+    "reference": "../shared-references/output-versioning.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/research-pipeline/SKILL.md",
+    "reference": "../shared-references/output-manifest.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/research-pipeline/SKILL.md",
+    "reference": "../shared-references/output-language.md",
+    "status": "missing in local source; not fabricated"
+  },
+  {
+    "skill": ".agents/skills/research-review/SKILL.md",
+    "reference": "../shared-references/output-composition.md",
+    "status": "missing in local source; not fabricated"
+  }
+]
